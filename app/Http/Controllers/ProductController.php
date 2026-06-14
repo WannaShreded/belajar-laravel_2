@@ -10,7 +10,9 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Redirect;
 use App\Http\Requests\StoreProductRequest;
+use function redirect;
 
 
 class ProductController extends Controller
@@ -49,20 +51,25 @@ class ProductController extends Controller
 
     // POST /products — simpan produk baru
     public function store(StoreProductRequest $request): RedirectResponse
-{
-    // $request sudah tervalidasi otomatis
-    // Jika gagal validasi, Laravel redirect kembali dengan error
+    {
+        // $request sudah tervalidasi otomatis
+        // Jika gagal validasi, Laravel redirect kembali dengan error
 
-    $data = $request->validated(); // hanya field yang lolos validasi
+        $data = $request->validated(); // hanya field yang lolos validasi
 
-    if ($request->hasFile("image")) {
-        $data['image'] = $request->file('image')->store('products', 'public');
+        // Generate slug jika belum ada atau kosong
+        if (empty($data['slug'])) {
+            $data['slug'] = Str::slug($data['name']) . '-' . Str::random(5);
+        }
+
+        if ($request->hasFile("image")) {
+            $data['image'] = $request->file('image')->store('products', 'public');
+        }
+
+        Product::create($data);
+
+        return redirect()->route('products.index')->with('success', 'Produk berhasil ditambahkan!');
     }
-
-    Product::create($data);
-
-    return to_route('products.index')->with('success', 'Produk berhasil ditambahkan!');
-}
 
     // GET /products/{product} — detail produk
     public function show(Product $product): View

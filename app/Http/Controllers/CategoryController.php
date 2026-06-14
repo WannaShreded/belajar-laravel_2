@@ -2,64 +2,104 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CategoryRequest;
 use App\Models\Category;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class CategoryController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Tampilkan semua kategori dengan pagination
      */
-    public function index()
+    public function index(): View
     {
-        //
+        $categories = Category::withCount('products')
+            ->paginate(10);
+
+        return view('categories.index', compact('categories'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Tampilkan form untuk membuat kategori baru
      */
-    public function create()
+    public function create(): View
     {
-        //
+        return view('categories.create');
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Simpan kategori baru ke database
+     * Validasi: name dan slug harus unik
      */
-    public function store(Request $request)
+    public function store(CategoryRequest $request): RedirectResponse
     {
-        //
+        // Validasi unik name dan slug
+        $validated = $request->validated();
+
+        // Cek duplikasi name
+        if (Category::where('name', $validated['name'])->exists()) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Nama kategori "' . $validated['name'] . '" sudah digunakan.');
+        }
+
+        // Cek duplikasi slug
+        if (Category::where('slug', $validated['slug'])->exists()) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Slug "' . $validated['slug'] . '" sudah digunakan.');
+        }
+
+        // Simpan kategori jika validasi unik passed
+        Category::create($validated);
+
+        return redirect()->route('categories.index')
+            ->with('success', 'Kategori berhasil ditambahkan!');
     }
 
     /**
-     * Display the specified resource.
+     * Tidak digunakan (redirect ke index)
      */
-    public function show(Category $category)
+    public function show(Category $category): RedirectResponse
     {
-        //
+        return redirect()->route('categories.index');
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Tampilkan form untuk edit kategori
      */
-    public function edit(Category $category)
+    public function edit(Category $category): View
     {
-        //
+        return view('categories.edit', compact('category'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update kategori di database
      */
-    public function update(Request $request, Category $category)
+    public function update(CategoryRequest $request, Category $category): RedirectResponse
     {
-        //
+        $category->update($request->validated());
+
+        return redirect()->route('categories.index')
+            ->with('success', 'Kategori berhasil diperbarui!');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Hapus kategori dari database
+     * CEK: kategori tidak boleh memiliki produk aktif
      */
-    public function destroy(Category $category)
+    public function destroy(Category $category): RedirectResponse
     {
-        //
+        // CEK apakah kategori masih memiliki produk aktif
+        if ($category->products()->where('status', 'active')->exists()) {
+            return redirect()->back()
+                ->with('error', 'Kategori tidak dapat dihapus karena masih memiliki produk aktif.');
+        }
+
+        $category->delete();
+
+        return redirect()->route('categories.index')
+            ->with('success', 'Kategori berhasil dihapus!');
     }
 }

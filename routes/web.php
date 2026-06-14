@@ -49,10 +49,7 @@ Route::prefix('admin')
 // 4. RESOURCE ROUTES
 Route::resource('products', ProductController::class);
 
-
-Route::resource('categories', CategoryController::class)
-    ->only(['index', 'store', 'destroy']);
-
+Route::resource('categories', CategoryController::class);
 
 Route::resource('orders', OrderController::class)
     ->except(['create', 'edit']);
