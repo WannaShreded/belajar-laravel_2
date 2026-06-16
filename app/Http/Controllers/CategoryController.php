@@ -90,16 +90,22 @@ class CategoryController extends Controller
      * CEK: kategori tidak boleh memiliki produk aktif
      */
     public function destroy(Category $category): RedirectResponse
-    {
-        // CEK apakah kategori masih memiliki produk aktif
-        if ($category->products()->where('status', 'active')->exists()) {
-            return redirect()->back()
-                ->with('error', 'Kategori tidak dapat dihapus karena masih memiliki produk aktif.');
-        }
-
-        $category->delete();
-
-        return redirect()->route('categories.index')
-            ->with('success', 'Kategori berhasil dihapus!');
+{
+    if ($category->products()->where('status', 'active')->exists()) {
+        return back()->with(
+            'error',
+            'Kategori masih memiliki produk aktif.'
+        );
     }
+
+    $category->products()
+        ->withTrashed()
+        ->forceDelete();
+
+    $category->delete();
+
+    return redirect()
+        ->route('categories.index')
+        ->with('success', 'Kategori berhasil dihapus.');
+}
 }
