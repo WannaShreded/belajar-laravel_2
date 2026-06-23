@@ -8,7 +8,7 @@ enum ProductStatus: string
     case Active   = 'active';
     case Inactive = 'inactive';
     case Draft    = 'draft';
-
+    case OutOfStock = 'out_of_stock';
 
     // Label untuk tampil di UI
     public function label(): string

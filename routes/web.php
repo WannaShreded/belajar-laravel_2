@@ -5,6 +5,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CategoryProductController;
 use App\Http\Controllers\OrderController;
@@ -43,6 +44,8 @@ Route::prefix('admin')
             ->name('dashboard');
         Route::get('/users', fn () => 'Admin Users')
             ->name('users');
+        Route::get('/reports', [ReportController::class, 'index'])
+            ->name('reports');
     });
 
 
@@ -64,7 +67,6 @@ Route::resource(
 
 // 6. REDIRECT & FALLBACK
 Route::redirect('/old-url', '/new-url', 301);
-
 
 Route::fallback(function () {
     abort(404);
