@@ -6,6 +6,7 @@ use App\Http\Controllers\CategoryProductController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ReportController;
 use Illuminate\Http\Request;
@@ -37,13 +38,17 @@ Route::get('/dashboard', function () {
 // Route Admin - hanya bisa diakses Admin
 // =============================================
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    // Admin dashboard
+    Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
+
+    // Role management
+    Route::resource('roles', RoleController::class)->except(['show']);
+
     // Halaman daftar user
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
 
-
     // Halaman edit user
     Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
-
 
     // Update data user
     Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');

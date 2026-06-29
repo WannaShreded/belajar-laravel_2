@@ -65,9 +65,13 @@ class UserController extends Controller
 
         $this->authorize('delete-users');
         // Cek apakah user yang akan dihapus adalah user yang sedang login
-        if (auth()->id === $user->id) {
+        if (auth()->id() === $user->id) {
             return redirect()->route('admin.users.index')
                 ->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
+        }
+
+        if ($user->orders()->exists()) {
+            $user->orders()->delete();
         }
 
         $user->delete();

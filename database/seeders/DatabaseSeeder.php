@@ -11,13 +11,14 @@ class DatabaseSeeder extends Seeder
     {
         // Urutan penting: seeder yang punya FK harus dipanggil setelah parent-nya
         $this->call([
-            AdminUserSeeder::class,   // 1. Admin user
-            UserSeeder::class,        // 2. Regular users
-            CategorySeeder::class,    // 3. Categories
-            ProductSeeder::class,     // 4. Products (needs category)
-            ReviewSeeder::class,      // 5. Reviews (needs user & product)
-            CouponSeeder::class,      // 6. Coupons (independent)
-            OrderSeeder::class,       // 7. Orders
+            RolePermissionSeeder::class, // 1. Roles & permissions
+            AdminUserSeeder::class,      // 2. Admin user
+            UserSeeder::class,           // 3. Regular users
+            CategorySeeder::class,       // 4. Categories
+            ProductSeeder::class,        // 5. Products (needs category)
+            ReviewSeeder::class,         // 6. Reviews (needs user & product)
+            CouponSeeder::class,         // 7. Coupons (independent)
+            OrderSeeder::class,          // 8. Orders
         ]);
     }
 }

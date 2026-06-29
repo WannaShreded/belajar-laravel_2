@@ -21,36 +21,49 @@ class RolePermissionSeeder extends Seeder
 
 
         // Buat permission
-        Permission::create(['name' => 'view-dashboard']);
-        Permission::create(['name' => 'view-users']);
-        Permission::create(['name' => 'edit-users']);
+        $permissions = [
+            'view-dashboard',
+            'view-users',
+            'edit-users',
+            'delete-users',
+            'view roles',
+            'create roles',
+            'edit roles',
+            'delete roles',
+        ];
 
+        foreach ($permissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission]);
+        }
 
         // Buat role Admin dan beri semua permission
-        $admin = Role::create(['name' => 'admin']);
-        $admin->givePermissionTo(['view-dashboard', 'view-users', 'edit-users']);
-
+        $admin = Role::firstOrCreate(['name' => 'admin']);
+        $admin->syncPermissions(Permission::pluck('name')->toArray());
 
         // Buat role Manager, hanya boleh akses dashboard
-        $manager = Role::create(['name' => 'manager']);
-        $manager->givePermissionTo(['view-dashboard']);
-
+        $manager = Role::firstOrCreate(['name' => 'manager']);
+        $manager->syncPermissions(['view-dashboard']);
 
         // Buat user Admin
-        $adminUser = User::create([
-            'name'     => 'Admin User',
-            'email'    => 'admin@example.com',
-            'password' => Hash::make('password'),
-        ]);
+        $adminUser = User::firstOrCreate(
+            ['email' => 'admin@example.com'],
+            [
+                'name' => 'Admin User',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+            ]
+        );
         $adminUser->assignRole('admin');
 
-
         // Buat user Manager
-        $managerUser = User::create([
-            'name'     => 'Manager User',
-            'email'    => 'manager@example.com',
-            'password' => Hash::make('password'),
-        ]);
+        $managerUser = User::firstOrCreate(
+            ['email' => 'manager@example.com'],
+            [
+                'name' => 'Manager User',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+            ]
+        );
         $managerUser->assignRole('manager');
     }
 }

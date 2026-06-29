@@ -127,6 +127,16 @@
 
                     <li class="nav-item">
                         <a
+                            class="nav-link {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}"
+                            href="{{ route('admin.roles.index') }}"
+                        >
+                            <i class="bi bi-shield-lock-fill"></i>
+                            Roles
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
                             class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}"
                             href="{{ route('categories.index') }}"
                         >
